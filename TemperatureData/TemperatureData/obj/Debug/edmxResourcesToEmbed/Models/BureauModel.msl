@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="BureauDBModelStoreContainer" CdmEntityContainer="BureauDBEntities">
+    <EntitySetMapping Name="DailyDatas">
+      <EntityTypeMapping TypeName="BureauDBModel.DailyData">
+        <MappingFragment StoreEntitySet="DailyData">
+          <ScalarProperty Name="rainDays" ColumnName="rainDays" />
+          <ScalarProperty Name="rainfall" ColumnName="rainfall" />
+          <ScalarProperty Name="maxTemp" ColumnName="maxTemp" />
+          <ScalarProperty Name="minTemp" ColumnName="minTemp" />
+          <ScalarProperty Name="day" ColumnName="day" />
+          <ScalarProperty Name="month" ColumnName="month" />
+          <ScalarProperty Name="year" ColumnName="year" />
+          <ScalarProperty Name="stationNumber" ColumnName="stationNumber" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Stations">
+      <EntityTypeMapping TypeName="BureauDBModel.Station">
+        <MappingFragment StoreEntitySet="Stations">
+          <ScalarProperty Name="stationName" ColumnName="stationName" />
+          <ScalarProperty Name="stationNumber" ColumnName="stationNumber" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>

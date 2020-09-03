@@ -1,0 +1,612 @@
+﻿
+@{
+    ViewBag.Title = "Weather Details";
+}
+
+<style>
+    .axis path,
+    .axix line
+    {
+        stroke : white;
+        stroke-width: 3px;
+    }
+
+    .axis text{
+        fill : white;
+    }
+    
+    h2{
+        text-align:center;
+    }
+
+    button {
+        background-color: #009933;
+        border-radius: 4px;
+        color: white;
+    }
+
+
+</style>
+
+<h2>Climate Data For <span id="stationName"></span></h2>
+
+
+<!-- put your HTML and Ajax here to show the selected weather station data here -->
+<!-- your selected station graphs and tables should appear below -->
+<div id="data"></div>
+
+
+<script src="~/Scripts/jquery-3.3.1.js"></script>
+<script src="~/Scripts/bootstrap.js"></script>
+<script src="~/Scripts/jquery.color-2.1.2.js"></script>
+<script src="https://d3js.org/d3.v5.min.js"></script>
+
+<script>
+    $.ajax({
+        url: "/api/Temperature/" + window.location.search.substring(11),
+        method: "GET",
+        data: null,
+        dataType: "json",
+        timeout: 5000,
+        success: success,
+        error: monthError
+    })
+
+    var temp = ""; //year be clicked
+    var clicked = false; //click status
+
+    function success(data) {
+
+        var name = $('<span>').text(data.stationName).addClass('textStation');
+        $(name).appendTo('#stationName');
+
+        var textYear = $('<h5>').text('Year').addClass('textYear');
+        $(textYear).appendTo('#data');
+
+        var svgWidth = 1000;
+        var svgHeight = 600;
+        var barHeight = 20;
+        var maxTemp = [];
+        var minTemp = [];
+        var positive = [];
+        var year = [];
+        var count = 0;
+        var margin = { top:0, right: 20, bottom: 0, left: 40 },
+            width = 1000 - margin.left - margin.right,
+            height = 600 - margin.top - margin.bottom;
+
+        $.each(data.annualStats, function (i, annual) {  //push max temperature to the array
+            if (annual.year >= 2012) {
+                if (annual.maxTemp == null) {
+                    maxTemp.push(0.0)
+                    count++;
+                }
+                else {
+                    maxTemp.push(parseFloat(annual.maxTemp).toFixed(1));
+                    count++;
+                }
+                
+            }
+            
+        });
+        var max = d3.max(d3.values(maxTemp));
+
+        $.each(data.annualStats, function (i, annual) { //push minimum temperature to the array
+            if (annual.year >= 2012) {
+                if (annual.minTemp == null) {
+                    minTemp.push(100.0);
+                }
+                else {
+                    minTemp.push(parseFloat(annual.minTemp).toFixed(1));
+                }
+
+            }
+
+        });
+
+        $.each(data.annualStats, function (i, annual) { //add minimum temperatrue by 10 to avoid negitive values
+            if (annual.year >= 2012) {
+                if (annual.minTemp == null) {
+                    positive.push(100.0);
+                }
+                else
+                {
+                    positive.push(parseFloat(annual.minTemp + 10.0).toFixed(1));
+                }
+       
+            }
+
+        });
+        
+        $.each(data.annualStats, function (i, annual) { //push year to the arrary
+            if (annual.year >= 2012) {
+                year.push(annual.year);
+            }
+        });
+
+        var svg = d3.select('#data')  //create svg
+            .append('svg')
+            .attr("height", svgHeight)
+            .attr('width', svgWidth);
+
+        var xLinear = d3.scaleLinear() 
+            .domain([0, max])
+            .range([0, 1000 - margin.left]);
+
+        var yLinear = d3.scaleLinear()
+            .range([0, svgHeight]);
+
+        var yAxis = d3.axisLeft(yLinear).tickValues([]).tickSize(0);
+
+        var xAxis = d3.axisBottom(xLinear).tickSize(0).tickFormat('');
+           
+
+        var bars = svg   //create bar group
+            .selectAll('g')
+            .data(maxTemp)
+            .enter()
+            .append('g')
+            .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+            .classed('group', true);
+
+        bars     //create bar of max temperature
+            .data(maxTemp)
+            .append('rect')
+            .attr('width', 0)
+            .attr('height', barHeight)
+            .attr('x', 0)
+            .attr('y', function (d, i) {
+                return i * (svgHeight / count);
+            })
+            .transition()
+            .duration(2000)
+            .attr('width', function (d) {
+                if (d == 0.0)
+                    return 35;
+                else {
+                    return xLinear(d);
+                }
+                
+            })
+            .attr('height', barHeight)
+            .style("stroke", 'white')
+            .attr('fill', '#990000');
+
+
+        bars  //create text of max temperature
+            .append('text')
+            .attr('fill', 'white')
+            .attr('font-size', '10px')
+            .classed('maxText', true)
+            .attr('x', 0)
+            .attr('y', function (d, i) {
+                return i * (svgHeight / count) + 10;
+            })
+            .transition()
+            .duration(2000)
+            .attr('x', function (d, i) {
+                if (d == 0.0) {
+                    return '10';
+                }
+                else {
+                    return xLinear(d) - 30;
+                }
+            })
+            .attr('y', function (d, i) {
+                return i * (svgHeight / count) + 10;
+            })
+            .text(function (d, i) {
+                if (d == 0.0) {
+                    return 'N/A';
+                }
+                else {
+                    return d + '°C';
+                }
+
+            });
+
+
+
+
+        bars //create bar of min temperature
+            .data(positive)
+            .append('rect')
+            .attr('width', 0)
+            .attr('height', barHeight)
+            .attr('x', 0)
+            .attr('y', function (d, i) {
+                return i * (svgHeight / count) + barHeight;
+            })
+            .transition()
+            .duration(2000)
+            .attr('width', function (d) {
+                if (d == 100.0)
+                    return 35;
+                else {
+
+                    return xLinear(d);
+                }
+
+            })
+            .attr('height', barHeight)
+            .style("stroke", 'white')
+            .attr('fill', '#0000b3');
+
+        bars //create text of max temperature
+            .data(positive)
+            .append('text')
+            .attr('fill', 'white')
+            .attr('font-size', '10px')
+            .classed('minText', true)
+            .attr('x', 0)
+            .attr('y', function (d, i) {
+                return i * (svgHeight / count) + 10 + barHeight;
+            })
+            .transition()
+            .duration(2000)
+            .attr('x', function (d, i) {
+                if (d == 100.0) {
+                    return 10;
+                }
+                else{
+                    return xLinear(d) - 30;
+                }
+       
+            })
+            .attr('y', function (d, i) {
+                return i * (svgHeight / count) + 10 + barHeight; 
+            })
+            .text(function (d, i) {
+                if (d == 100.0) {
+                    return 'N/A';
+                }
+                else {
+                    return parseFloat(d - 10.0).toFixed(1) + '°C';
+                }
+
+            });
+
+        bars //create text of y axis
+            .data(year)
+            .append('text')
+            .classed('yText',true)
+            .attr('fill', 'white')
+            .attr('font-size', '15px')
+            .classed('year', true)
+            .attr('x', -35)
+            .attr('y', function (d, i) {
+                return i * (svgHeight / count) + 10 + barHeight;
+            })
+            .text(function (d) {
+                return d;
+            });
+
+        bars //hover horizon
+            .data(year)
+            .append('rect')
+            .classed('hoverHorizon', true)
+            .attr('width', svgWidth)
+            .attr('height', function (d, i) {
+                return svgHeight / count;
+            })
+            .attr('fill', '#000000')
+            .attr('opacity', '0.1')
+            .attr('x', -margin.left)
+            .attr('y', function (d, i) {
+                return i * (svgHeight / count);
+            })
+           
+            .on("mouseover", function () {
+                d3.select(this).attr('fill', '#808080')
+                    .attr('opacity', '0.5');
+            })
+            .on("click", function (d) {
+                clicked = true;  //set the click staus to true
+                temp = d;       //get the year that has been clicked
+            })
+            .on("mouseout", function () {
+                d3.select(this).attr('fill', '#000000')
+                    .attr('opacity', '0.1');
+            })
+            .append('title')
+            .text(function (d) {
+                return 'Click to view the monthly breakdown for the year ' + d;
+            });
+
+        $('.hoverHorizon').on('click', function () {  //change the data to the next api
+            if (clicked == true) {
+                $.ajax({
+                    url: "/api/Temperature/" + window.location.search.substring(11) + "/" + temp,
+                    method: "GET",
+                    data: null,
+                    dataType: "json",
+                    timeout: 5000,
+                    success: month,
+                    error: error
+                })
+            }
+        });
+        
+        
+
+        $('.hoverHorizon') //change the cursor to pointer
+            .data(year)
+            .css('cursor', 'pointer');
+
+        svg.append('g') //x axis line
+            .classed('axis x', true)
+            .attr('transform', 'translate(40,' + 600 + ')')
+            .call(xAxis);
+
+        svg.append('g') //y axis line
+            .classed('axis y', true)
+            .attr('transform', 'translate(40,' + 0 + ')')
+            .call(yAxis);
+            
+
+        var textTemperature = $('<h5>').text('Temperature').css({ top: '740px', left: 1070, position: 'absolute' }).addClass('textTemperature');
+        var button = $('<Button>').text('Return To Station List').on('click', function () { //button back to the station page
+            window.location.href = '/Climate/Index'
+        });
+
+        $('#data').append(textTemperature);
+        $('#data').append('<br><br>').append(button);
+
+        
+    }
+    function error(data) { //error function
+        var errorMessage = $('<h3>').text('Failed to load Annual Details');
+        $(errorMessage).appendTo('#data').css('color', 'white');
+    }
+
+
+    function month(data) { //function to display the temperature of each month in the choosen year
+        $('br').remove();
+        $('svg').remove();
+        $('.textYear').remove();
+        $('button').remove();
+        $('.textTemperature').remove(); //remove all the elements
+
+        var textMonth = $('<h5>').text('Month');
+        $(textMonth).appendTo('#data');
+
+        var svgWidth = 1000;
+        var svgHeight = 600;
+        var barHeight = 15;
+        var month = [];
+        var positive = [];
+        var maxTemp = [];
+        var count = 0;
+        var margin = { top: 0, right: 20, bottom: 0, left: 70 },
+            width = 1000 - margin.left - margin.right,
+            height = 600 - margin.top - margin.bottom;
+
+        $.each(data.monthlyStats, function (i, monthly) { //push max temp into array
+                if (monthly.maxTemp == null) {
+                    maxTemp.push(0.0)
+                    count++;
+                }
+                else {
+                    maxTemp.push(parseFloat(monthly.maxTemp).toFixed(1));
+                    count++;
+                }
+            });
+            var max = d3.max(d3.values(maxTemp));
+
+
+            $.each(data.monthlyStats, function (i, monthly) { //push min temp into array
+                if (monthly.minTemp == null) {
+                        positive.push(100.0);
+                    }
+                    else {
+                    positive.push(parseFloat(monthly.minTemp + 10.0).toFixed(1));
+                    }
+
+            });
+
+            $.each(data.monthlyStats, function (i, monthly) { //push months into array
+                month.push(monthly.monthName);
+            });
+
+            var xLinear = d3.scaleLinear()
+                .domain([0, max])
+                .range([0, 1000 - margin.left]);
+
+            var yLinear = d3.scaleLinear() 
+                .range([0, svgHeight]);
+
+            var svg = d3.select('#data')  //create new svg
+                .append('svg')
+                .attr("height", svgHeight)
+                .attr('width', svgWidth);
+
+            var bars = svg       //create new bar group
+                .selectAll('g')
+                .data(maxTemp)
+                .enter()
+                .append('g')
+                .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+                .classed('newGroup', true);
+
+            bars
+                .data(maxTemp)  //bar of max temp
+                .append('rect')
+                .attr('width', 0)
+                .attr('height', barHeight)
+                .attr('x', 0)
+                .attr('y', function (d, i) {
+                    return i * (svgHeight / count);
+                })
+                .transition()
+                .duration(2000)
+                .attr('width', function (d) {
+                    if (d == 0.0)
+                        return 35;
+                    else {
+                        return xLinear(d);
+                    }
+
+                })
+                .attr('height', barHeight)
+                .style("stroke", 'white')
+                .attr('fill', '#990000');
+
+
+            bars
+                .append('text')  //text of max temp
+                .attr('fill', 'white')
+                .attr('font-size', '10px')
+                .classed('maxText', true)
+                .attr('x', 0)
+                .attr('y', function (d, i) {
+                    return i * (svgHeight / count) + 10;
+                })
+                .transition()
+                .duration(2000)
+                .attr('x', function (d, i) {
+                    if (d == 0.0) {
+                        return '10';
+                    }
+                    else {
+                        return xLinear(d) - 30;
+                    }
+                })
+                .attr('y', function (d, i) {
+                    return i * (svgHeight / count) + 10;
+                })
+                .text(function (d, i) {
+                    if (d == 0.0) {
+                        return 'N/A';
+                    }
+                    else {
+                        return d + '°C';
+                    }
+
+                });
+
+            bars  //bar of min temp
+                .data(positive)
+                .append('rect')
+                .attr('width', 0)
+                .attr('height', barHeight)
+                .attr('x', 0)
+                .attr('y', function (d, i) {
+                    return i * (svgHeight / count) + barHeight;
+                })
+                .transition()
+                .duration(2000)
+                .attr('width', function (d) {
+                    if (d == 100.0)
+                        return 35;
+                    else {
+
+                        return xLinear(d);
+                    }
+
+                })
+                .attr('height', barHeight)
+                .style("stroke", 'white')
+                .attr('fill', '#0000b3');
+
+            bars  //text of min temp
+                .data(positive)
+                .append('text')
+                .attr('fill', 'white')
+                .attr('font-size', '10px')
+                .classed('minText', true)
+                .attr('x', 0)
+                .attr('y', function (d, i) {
+                    return i * (svgHeight / count) + 10 + barHeight;
+                })
+                .transition()
+                .duration(2000)
+                .attr('x', function (d, i) {
+                    if (d == 100.0) {
+                        return 10;
+                    }
+                    else {
+                        return xLinear(d) - 30;
+                    }
+
+                })
+                .attr('y', function (d, i) {
+                    return i * (svgHeight / count) + 10 + barHeight;
+                })
+                .text(function (d, i) {
+                    if (d == 100.0) {
+                        return 'N/A';
+                    }
+                    else {
+                        return parseFloat(d - 10.0).toFixed(1) + '°C';
+                    }
+
+                });
+
+            bars //month text on y axis
+                .data(month)
+                .append('text')
+                .classed('yText', true)
+                .attr('fill', 'white')
+                .attr('font-size', '12px')
+                .attr('font-weight','500')
+                .classed('year', true)
+                .attr('x', -60)
+                .attr('y', function (d, i) {
+                    return i * (svgHeight / count) + 10 + barHeight;
+                })
+                .text(function (d) {
+                    return d;
+                });
+
+            var yAxis = d3.axisLeft(yLinear).tickValues([]).tickSize(0); //set x,y axis
+
+            var xAxis = d3.axisBottom(xLinear).tickSize(0).tickFormat('');
+
+            svg.append('g')  //create x axis
+                .classed('axis x', true)
+                .attr('transform', 'translate(70,' + 600 + ')')
+                .call(xAxis);
+
+            svg.append('g')  //create y axis
+                .classed('axis y', true)
+                .attr('transform', 'translate(70,' + 0 + ')')
+                .call(yAxis);
+
+            var textTemperature = $('<h5>').text('Temperature').css({ top: '740px', left: 1070, position: 'absolute' });
+            var button = $('<Button>').text('Return To Station List').on('click', function () { //button back to station page
+                window.location.href = '/Climate/Index'
+            });
+            var backButton = $('<Button>').text('Return To Annual Temperature').on('click', function () { //button back to annual temperature data
+                $('br').remove();
+                $('svg').remove();
+                $('h5').remove();
+                $('button').remove();
+                $('.textTemperature').remove();
+                $('#stationName span').remove();
+                $.ajax({
+                    url: "/api/Temperature/" + window.location.search.substring(11),
+                    method: "GET",
+                    data: null,
+                    dataType: "json",
+                    timeout: 5000,
+                    success: success,
+                    error: monthError
+                })
+            });
+
+            $('#data').append(textTemperature);
+            $('#data').append('<br><br>').append(button);
+            $('#data').append("  ").append(backButton);
+    }
+
+    function monthError(data) { //failed to load the month data
+        $('br').remove();
+        $('svg').remove();
+        $('.textYear').remove();
+        $('button').remove();
+        $('.textTemperature').remove();
+        var errorMessage = $('<h3>').text('Failed to load Annual Details');
+        $(errorMessage).appendTo('#data').css('color', 'white');
+    }
+    
+</script>

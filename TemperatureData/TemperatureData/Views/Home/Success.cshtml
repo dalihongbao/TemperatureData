@@ -1,0 +1,14 @@
+﻿@{
+    ViewBag.Title = "BOM Upload";
+}
+
+<div id="result" class="card text-white bg-success mb-3 my-2">
+    <div class="card-header">Success!</div>
+    <div class="card-body">
+        <h5 class="card-title">We have some good news for you. . .</h5>
+        <p class="card-text">@ViewBag.Message</p>
+    </div>
+</div>
+<div class="form-group">
+    @Html.ActionLink("Upload Another File", "UploadDailyData", new { controller = "Home" }, new { @class = "btn btn-secondary" })
+</div>

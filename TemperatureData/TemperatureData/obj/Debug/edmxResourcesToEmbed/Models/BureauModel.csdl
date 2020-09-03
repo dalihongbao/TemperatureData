@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="BureauDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityContainer Name="BureauDBEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="DailyDatas" EntityType="BureauDBModel.DailyData" />
+    <EntitySet Name="Stations" EntityType="BureauDBModel.Station" />
+    <AssociationSet Name="station_FK" Association="BureauDBModel.station_FK">
+      <End Role="Station" EntitySet="Stations" />
+      <End Role="DailyData" EntitySet="DailyDatas" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="DailyData">
+    <Key>
+      <PropertyRef Name="stationNumber" />
+      <PropertyRef Name="year" />
+      <PropertyRef Name="month" />
+      <PropertyRef Name="day" />
+    </Key>
+    <Property Name="stationNumber" Type="Int32" Nullable="false" />
+    <Property Name="year" Type="Int32" Nullable="false" />
+    <Property Name="month" Type="Int32" Nullable="false" />
+    <Property Name="day" Type="Int32" Nullable="false" />
+    <Property Name="minTemp" Type="Decimal" Precision="3" Scale="1" />
+    <Property Name="maxTemp" Type="Decimal" Precision="3" Scale="1" />
+    <Property Name="rainfall" Type="Decimal" Precision="4" Scale="1" />
+    <Property Name="rainDays" Type="Int32" />
+    <NavigationProperty Name="Station" Relationship="BureauDBModel.station_FK" FromRole="DailyData" ToRole="Station" a:GetterAccess="Internal" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" />
+  </EntityType>
+  <EntityType Name="Station">
+    <Key>
+      <PropertyRef Name="stationNumber" />
+    </Key>
+    <Property Name="stationNumber" Type="Int32" Nullable="false" />
+    <Property Name="stationName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <NavigationProperty Name="DailyDatas" Relationship="BureauDBModel.station_FK" FromRole="Station" ToRole="DailyData" a:GetterAccess="Internal" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" />
+  </EntityType>
+  <Association Name="station_FK">
+    <End Type="BureauDBModel.Station" Role="Station" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Type="BureauDBModel.DailyData" Role="DailyData" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Station">
+        <PropertyRef Name="stationNumber" />
+      </Principal>
+      <Dependent Role="DailyData">
+        <PropertyRef Name="stationNumber" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema>

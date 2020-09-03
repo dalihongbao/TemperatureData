@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="9997f7ecb6754e6b9381cce0e9572b91" Name="Diagram1">
+        <EntityTypeShape EntityType="BureauDBModel.DailyData" Width="1.5" PointX="3.375" PointY="0.75" />
+        <EntityTypeShape EntityType="BureauDBModel.Station" Width="1.5" PointX="1" PointY="1.125" />
+        <AssociationConnector Association="BureauDBModel.station_FK" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="BureauDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="DailyData">
+    <Key>
+      <PropertyRef Name="stationNumber" />
+      <PropertyRef Name="year" />
+      <PropertyRef Name="month" />
+      <PropertyRef Name="day" />
+    </Key>
+    <Property Name="stationNumber" Type="int" Nullable="false" />
+    <Property Name="year" Type="int" Nullable="false" />
+    <Property Name="month" Type="int" Nullable="false" />
+    <Property Name="day" Type="int" Nullable="false" />
+    <Property Name="minTemp" Type="decimal" Precision="3" Scale="1" />
+    <Property Name="maxTemp" Type="decimal" Precision="3" Scale="1" />
+    <Property Name="rainfall" Type="decimal" Precision="4" Scale="1" />
+    <Property Name="rainDays" Type="int" />
+  </EntityType>
+  <EntityType Name="Stations">
+    <Key>
+      <PropertyRef Name="stationNumber" />
+    </Key>
+    <Property Name="stationNumber" Type="int" Nullable="false" />
+    <Property Name="stationName" Type="varchar" MaxLength="100" />
+  </EntityType>
+  <Association Name="station_FK">
+    <End Role="Stations" Type="Self.Stations" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="DailyData" Type="Self.DailyData" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Stations">
+        <PropertyRef Name="stationNumber" />
+      </Principal>
+      <Dependent Role="DailyData">
+        <PropertyRef Name="stationNumber" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="BureauDBModelStoreContainer">
+    <EntitySet Name="DailyData" EntityType="Self.DailyData" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Stations" EntityType="Self.Stations" Schema="dbo" store:Type="Tables" />
+    <AssociationSet Name="station_FK" Association="Self.station_FK">
+      <End Role="Stations" EntitySet="Stations" />
+      <End Role="DailyData" EntitySet="DailyData" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>

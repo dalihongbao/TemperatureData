@@ -1,0 +1,74 @@
+﻿
+@{
+    ViewBag.Title = "Weather Stations";
+}
+
+<style>
+    tr {
+        background-color: #696969
+    }
+
+        tr:hover {
+            background-color: rgb(38,38,38)
+        }
+</style>
+
+
+<h2>Available Weather Stations</h2>
+<p>Data has been obtained from the <a href="http://www.bom.gov.au/climate/data/index.shtml" target="_blank">BOM website</a>.</p>
+
+<!-- put your HTML and Ajax here to list the available weather stations -->
+<!-- clicking on a station should take you to the annual data for that station -->
+<div id="data"></div>
+
+<script src="~/Scripts/jquery-3.3.1.js"></script>
+<script src="~/Scripts/bootstrap.js"></script>
+<script src="~/Scripts/jquery.color-2.1.2.js"></script>
+
+<script>
+    $.ajax({
+        url: "/api/Station",
+        method: "GET",
+        data: null,
+        dataType: "json",
+        timeout: 5000,
+        success: success,
+        error: error
+    })
+
+
+    function success(data) {
+
+        var trHead = $('<thead>').append(      //set the table head
+            $('<tr>'),
+            $('<th>').text('Code'),
+            $('<th>').text('Station'),
+            $('<th>').text('Period'),
+            $('<th>').text('Detail(Records of Total days)')
+        );
+        $(trHead).appendTo('#data').css('color', 'white');
+
+        $.each(data, function (i, station) {    //set the table body
+            var trBody = $('<tr>').attr('title', 'click to view annual climate data').css('cursor', 'pointer').on('click', function () {
+                window.location.href = '/Climate/Details?stationNo=' + station.stationNumber;  //redirect to the next page
+            }).append(  //set the table body
+                $('<td>').text(station.stationNumber),
+                $('<td>').text(station.stationName),
+                $('<td>').text(station.fromYear + ' - ' + station.toYear),
+                $('<td>').text(station.records + '/' + (station.missing + station.records)).attr('title', 'records:' + station.records + ' missing: ' + station.missing).css('cursor', 'pointer')
+                );
+            $(trBody).appendTo('#data').css('color', 'white');
+
+        });
+
+        $('th').css('width', '220').css('height', '50').css('text-align', 'center');
+        $('td').css('width', '220').css('height', '50').css('text-align', 'center');
+
+
+    }
+
+    function error(data) {
+        var errorMessage = $('<h3>').text('Failed to load Station Data');
+        $(errorMessage).appendTo('#data').css('color', 'white');
+    }
+</script>

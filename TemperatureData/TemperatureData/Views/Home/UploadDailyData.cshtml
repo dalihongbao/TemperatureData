@@ -1,0 +1,42 @@
+﻿@{
+    ViewBag.Title = "UploadFile";
+}
+
+<h2>Upload Monthly Data</h2>
+<p>
+    Data has been obtained from the <a href="http://www.bom.gov.au/climate/data/index.shtml" target="_blank">BOM website</a>.
+    This page provides the option of uploading additional weather station data and is only partially complete.
+</p>
+@{
+    ViewBag.Title = "BOM Upload";
+}
+
+<div id="result" class="card text-white bg-dark mb-3">
+    <div class="card-body">
+        <h5 class="card-title">File Upload Instructions (Optional)</h5>
+        <p class="card-text">
+            Use the <a href="http://www.bom.gov.au/climate/data/index.shtml" target="_blank">BOM</a>
+            website and select <b>Rainfall</b> or <b>Temperature</b> to upload.<br />
+            Then select the <b>Daily</b> option and choose your location of interest.<br />
+            Note the <b>Station Number</b> and enter this into the <b>Stations table</b> in the database
+            along with the <b>Station Name</b>.<br />
+            Once this detail is in place, select "Get Data" and then on the next page at the top right<br />
+            click on the link "All years of data" to get access to the appropriate spreadsheet.<br />
+            In the Zip file it downloads locate the file that has the daily data by columns and upload the data.<br />
+            Repeate the upload for all 3 files: Rainfall, Minimum Temperatures and Maximum Temperatures.  Each new upload will update the existing entries.<br />
+            <b>NOTE:</b> only rows from 2000 and newer will be loaded into the database.
+        </p>
+    </div>
+</div>
+
+@using (Html.BeginForm("UploadDailyData", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+
+    <div class="form-group form-text">
+        @Html.TextBox("file", "", new { type = "file", @class = "form-control col-6" })
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Upload" class="btn btn-secondary" />
+    </div>
+}
+

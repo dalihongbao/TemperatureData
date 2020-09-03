@@ -1,0 +1,77 @@
+﻿@{
+    ViewBag.Title = "Home";
+}
+@section styles{
+    <link href="~/Content/ClimateIcons.css" rel="stylesheet" />
+}
+@*example animations from https://codepen.io/jcsoriano18/pen/mERyNb?editors=1100*@
+<div class="row">
+    <div class="col-12 icon">
+        <div class="sunny">
+            <div class="sun">
+                <div class="rays"></div>
+            </div>
+        </div>
+
+        <div class="rainy">
+            <div class="cloud"></div>
+            <div class="rain"></div>
+        </div>
+
+        <div class="cloudy">
+            <div class="cloud"></div>
+            <div class="cloud"></div>
+        </div>
+
+        <div class="flurries">
+            <div class="cloud"></div>
+            <div class="snow">
+                <div class="flake"></div>
+                <div class="flake"></div>
+            </div>
+        </div>
+
+        <div class="thunder-storm">
+            <div class="cloud"></div>
+            <div class="lightning">
+                <div class="bolt"></div>
+                <div class="bolt"></div>
+            </div>
+        </div>
+
+        <div class="sun-shower">
+            <div class="cloud"></div>
+            <div class="sun">
+                <div class="rays"></div>
+            </div>
+            <div class="rain"></div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <h2>Getting started</h2>
+        <p>
+            Displays the table of available weather stations by loading the data using Ajax from the station database.<br />
+        </p>
+        <p>@Html.ActionLink("Weather Stations", "Index", new { controller = "Climate" }, new { @class = "btn btn-secondary" })</p>
+    </div>
+    <div class="col-md-4">
+        <h2>Selecting a Station</h2>
+        <p>
+            Clicking on a station row will take the user to the annual data graph.  This graph is generated using Ajax data from the <b>Temperature Controller</b>.<br />
+        </p>
+        <p>@Html.ActionLink("Hawker Data", "Details",  "Climate" , new { stationNo = 19017 }, new { @class = "btn btn-secondary" })</p>
+    </div>
+    <div class="col-md-4">
+        <h2>Selecting a Year</h2>
+        <p>
+            Clicking on a year displayed in the graph will load a new graph showing the monthly breakdown of data.<br />
+            The graph is generated using Ajax using <b>JQuery.animate()</b> or <b>D3 v5.1</b>, include the station detail and selected year.<br />
+            Each graph includes a link back to the previous page/state.
+        </p>
+        <p>@Html.ActionLink("Back to Hawker Data", "Details", "Climate", new { stationNo = 19017 }, new { @class = "btn btn-secondary" })</p>
+
+    </div>
+</div>

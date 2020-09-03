@@ -1,0 +1,26 @@
+[
+  {
+    "stationNumber": 23000,
+    "stationName": "Adelaide",
+    "fromYear": 2000,
+    "toYear": 2018,
+    "records": 361,
+    "missing": 6338
+  },
+  {
+    "stationNumber": 19017,
+    "stationName": "Hawker",
+    "fromYear": 2000,
+    "toYear": 2018,
+    "records": 6668,
+    "missing": 30
+  },
+  {
+    "stationNumber": 23013,
+    "stationName": "Parafield",
+    "fromYear": 2000,
+    "toYear": 2018,
+    "records": 6685,
+    "missing": 14
+  }
+]

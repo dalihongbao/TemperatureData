@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="BureauDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="DailyData">
+          <Key>
+            <PropertyRef Name="stationNumber" />
+            <PropertyRef Name="year" />
+            <PropertyRef Name="month" />
+            <PropertyRef Name="day" />
+          </Key>
+          <Property Name="stationNumber" Type="int" Nullable="false" />
+          <Property Name="year" Type="int" Nullable="false" />
+          <Property Name="month" Type="int" Nullable="false" />
+          <Property Name="day" Type="int" Nullable="false" />
+          <Property Name="minTemp" Type="decimal" Precision="3" Scale="1" />
+          <Property Name="maxTemp" Type="decimal" Precision="3" Scale="1" />
+          <Property Name="rainfall" Type="decimal" Precision="4" Scale="1" />
+          <Property Name="rainDays" Type="int" />
+        </EntityType>
+        <EntityType Name="Stations">
+          <Key>
+            <PropertyRef Name="stationNumber" />
+          </Key>
+          <Property Name="stationNumber" Type="int" Nullable="false" />
+          <Property Name="stationName" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <Association Name="station_FK">
+          <End Role="Stations" Type="Self.Stations" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="DailyData" Type="Self.DailyData" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Stations">
+              <PropertyRef Name="stationNumber" />
+            </Principal>
+            <Dependent Role="DailyData">
+              <PropertyRef Name="stationNumber" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="BureauDBModelStoreContainer">
+          <EntitySet Name="DailyData" EntityType="Self.DailyData" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Stations" EntityType="Self.Stations" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="station_FK" Association="Self.station_FK">
+            <End Role="Stations" EntitySet="Stations" />
+            <End Role="DailyData" EntitySet="DailyData" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="BureauDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="BureauDBEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="DailyDatas" EntityType="BureauDBModel.DailyData" />
+          <EntitySet Name="Stations" EntityType="BureauDBModel.Station" />
+          <AssociationSet Name="station_FK" Association="BureauDBModel.station_FK">
+            <End Role="Station" EntitySet="Stations" />
+            <End Role="DailyData" EntitySet="DailyDatas" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="DailyData">
+          <Key>
+            <PropertyRef Name="stationNumber" />
+            <PropertyRef Name="year" />
+            <PropertyRef Name="month" />
+            <PropertyRef Name="day" />
+          </Key>
+          <Property Name="stationNumber" Type="Int32" Nullable="false" />
+          <Property Name="year" Type="Int32" Nullable="false" />
+          <Property Name="month" Type="Int32" Nullable="false" />
+          <Property Name="day" Type="Int32" Nullable="false" />
+          <Property Name="minTemp" Type="Decimal" Precision="3" Scale="1" />
+          <Property Name="maxTemp" Type="Decimal" Precision="3" Scale="1" />
+          <Property Name="rainfall" Type="Decimal" Precision="4" Scale="1" />
+          <Property Name="rainDays" Type="Int32" />
+          <NavigationProperty Name="Station" Relationship="BureauDBModel.station_FK" FromRole="DailyData" ToRole="Station" a:GetterAccess="Internal" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" />
+        </EntityType>
+        <EntityType Name="Station">
+          <Key>
+            <PropertyRef Name="stationNumber" />
+          </Key>
+          <Property Name="stationNumber" Type="Int32" Nullable="false" />
+          <Property Name="stationName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="DailyDatas" Relationship="BureauDBModel.station_FK" FromRole="Station" ToRole="DailyData" a:GetterAccess="Internal" xmlns:a="http://schemas.microsoft.com/ado/2006/04/codegeneration" />
+        </EntityType>
+        <Association Name="station_FK">
+          <End Type="BureauDBModel.Station" Role="Station" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="BureauDBModel.DailyData" Role="DailyData" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Station">
+              <PropertyRef Name="stationNumber" />
+            </Principal>
+            <Dependent Role="DailyData">
+              <PropertyRef Name="stationNumber" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="BureauDBModelStoreContainer" CdmEntityContainer="BureauDBEntities">
+          <EntitySetMapping Name="DailyDatas">
+            <EntityTypeMapping TypeName="BureauDBModel.DailyData">
+              <MappingFragment StoreEntitySet="DailyData">
+                <ScalarProperty Name="rainDays" ColumnName="rainDays" />
+                <ScalarProperty Name="rainfall" ColumnName="rainfall" />
+                <ScalarProperty Name="maxTemp" ColumnName="maxTemp" />
+                <ScalarProperty Name="minTemp" ColumnName="minTemp" />
+                <ScalarProperty Name="day" ColumnName="day" />
+                <ScalarProperty Name="month" ColumnName="month" />
+                <ScalarProperty Name="year" ColumnName="year" />
+                <ScalarProperty Name="stationNumber" ColumnName="stationNumber" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Stations">
+            <EntityTypeMapping TypeName="BureauDBModel.Station">
+              <MappingFragment StoreEntitySet="Stations">
+                <ScalarProperty Name="stationName" ColumnName="stationName" />
+                <ScalarProperty Name="stationNumber" ColumnName="stationNumber" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
